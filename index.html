@@ -524,6 +524,7 @@ function applyLang() {
 
 document.querySelectorAll('.lo').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; applyLang(); }));
 applyLang();
+setInterval(render, 4000);  
 </script>
 </body>
 </html>

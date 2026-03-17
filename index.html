@@ -381,48 +381,57 @@ async function saveItems(items) {
     body: JSON.stringify({ items })
   });
 }
-}
+
 
 // ── Actions ──
-function addItem() {
+async function addItem() {
   const name = document.getElementById('iName').value.trim();
   const qty  = parseInt(document.getElementById('iQty').value) || 1;
-  if (!name) { document.getElementById('iName').focus(); return; }
-  const items = loadItems();
+  if (!name) {
+    document.getElementById('iName').focus();
+    return; 
+  }
+  const items = await loadItems();
   items.push({ id: Date.now(), name, qty, loc: selLoc, day, done: false, ts: Date.now() });
-  saveItems(items);
+  await saveItems(items);
   document.getElementById('iName').value = '';
   document.getElementById('iQty').value  = '1';
   document.getElementById('iName').focus();
   render();
 }
 
-function toggleDone(id) {
-  const items = loadItems();
+async function toggleDone(id) {
+  const items = await loadItems();
   const item  = items.find(i => i.id === id);
   if (item) { item.done = !item.done; saveItems(items); render(); }
 }
 
-function delItem(id) {
-  saveItems(loadItems().filter(i => i.id !== id));
+async function delItem(id) {
+  const items = await loadItems();
+  const newItems = items.filter(i => i.id !== id);
+  await saveItems(newItems);
   render();
 }
 
-function changeQty(id, d) {
-  const items = loadItems();
+async function changeQty(id, d) {
+  const items = await loadItems();
   const item  = items.find(i => i.id === id);
   if (item) { item.qty = Math.max(1, (item.qty || 1) + d); saveItems(items); render(); }
 }
 
-function clearDone() {
+async function clearDone() {
   if (!confirm(s('confirm'))) return;
-  saveItems(loadItems().filter(i => !(i.done && i.day === day)));
+
+  const items = await loadItems();
+  const newItems = items.filter(i => !(i.done && i.day === day));
+
+  await saveItems(newItems);
   render();
 }
 
 // ── Render ──
-function render() {
-  const items = loadItems();
+async function render() {
+  const items = await loadItems();
   document.getElementById('cnt-sun').textContent = items.filter(i => i.day==='sunday'    && !i.done).length;
   document.getElementById('cnt-wed').textContent = items.filter(i => i.day==='wednesday' && !i.done).length;
 

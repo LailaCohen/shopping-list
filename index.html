@@ -360,12 +360,27 @@ let lang='en', day='sunday', view='all', locF='all', selLoc='EV';
 const LOCS = ['EV','Calendula','Whitesville','School'];
 const s = k => STR[lang][k] || k;
 
-// ── Storage (localStorage — swap for JSONBin later) ──
-function loadItems() {
-  try { return JSON.parse(localStorage.getItem('sc_items') || '[]'); } catch(e) { return []; }
+async function loadItems() {
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+    headers: {
+      "X-Master-Key": API_KEY
+    }
+  });
+
+  const data = await res.json();
+  return data.record.items || [];
 }
-function saveItems(items) {
-  localStorage.setItem('sc_items', JSON.stringify(items));
+
+async function saveItems(items) {
+  await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Master-Key": API_KEY
+    },
+    body: JSON.stringify({ items })
+  });
+}
 }
 
 // ── Actions ──
